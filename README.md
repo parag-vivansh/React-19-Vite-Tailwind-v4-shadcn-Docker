@@ -1,73 +1,77 @@
-# React + TypeScript + Vite
+# React 19 + Tailwind v4 (Docker)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React 19 app with TypeScript, Vite, and Tailwind CSS v4, set up for development and production with Docker.
 
-Currently, two official plugins are available:
+## Tech stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **React 19** with TypeScript  
+- **Vite 7** (dev server & build)  
+- **Tailwind CSS v4** (with `@tailwindcss/vite`)  
+- **Docker** (Node 22 Alpine for dev, nginx for production)
 
-## React Compiler
+## Prerequisites
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Local dev:** Node.js 22+, Yarn  
+- **Docker:** Docker and Docker Compose
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Quick start
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Option 1: Local (no Docker)
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+yarn install
+yarn dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+App: [http://localhost:5173](http://localhost:5173)
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Option 2: Docker (development)
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+docker compose build --no-cache frontend
+docker compose up -d frontend
 ```
+
+App: [http://localhost:5173](http://localhost:5173)  
+Dependencies are installed at first run into the container volume (image stays small).
+
+### Option 3: Docker (production build)
+
+Small image (~50–80 MB): nginx + built static files only.
+
+```bash
+docker compose -f docker-compose.prod.yml build --no-cache
+docker compose -f docker-compose.prod.yml up -d
+```
+
+App: [http://localhost:80](http://localhost:80)
+
+---
+
+## Scripts
+
+| Command        | Description              |
+|----------------|--------------------------|
+| `yarn dev`     | Start Vite dev server    |
+| `yarn build`   | TypeScript + Vite build  |
+| `yarn preview` | Preview production build |
+| `yarn lint`    | Run ESLint               |
+| `yarn format`  | Format with Prettier     |
+
+---
+
+## Docker details
+
+- **Development:** `target: development` — Node 22 Alpine; `node_modules` live in a volume (installed on first start).  
+- **Production:** `target: production` — Multi-stage build; final image is `nginx:alpine` + `dist/` only.  
+- **Rebuild after Dockerfile changes:**  
+  `docker compose build --no-cache frontend && docker compose up -d frontend`
+
+---
+
+## Further configuration
+
+- **React Compiler:** Not enabled by default. See [React Compiler installation](https://react.dev/learn/react-compiler/installation) to add it.  
+- **ESLint:** For type-aware rules, use `tseslint.configs.recommendedTypeChecked` (or `strictTypeChecked`) in `eslint.config.js` and set `parserOptions.project` to your tsconfig files.
