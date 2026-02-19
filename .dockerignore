@@ -1,3 +1,15 @@
 node_modules
 dist
 .git
+.gitignore
+.dockerignore
+Dockerfile*
+docker-compose*
+*.md
+.env*
+.npm
+.yarn
+*.log
+coverage
+.vscode
+.cursor

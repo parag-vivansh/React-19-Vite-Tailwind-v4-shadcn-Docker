@@ -10,4 +10,4 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
-    container_name: react-frontend
+    container_name: react-19-tailwind-v4-with-docker-development
